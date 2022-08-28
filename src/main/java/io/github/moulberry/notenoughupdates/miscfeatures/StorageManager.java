@@ -44,6 +44,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
@@ -72,6 +73,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,11 +84,12 @@ public class StorageManager {
 	private static final StorageManager INSTANCE = new StorageManager();
 	private static final Gson GSON = new GsonBuilder()
 		.registerTypeAdapter(ItemStack.class, new ItemStackSerializer())
-		.registerTypeAdapter(ItemStack.class, new ItemStackDeserilizer()).create();
+		.registerTypeAdapter(ItemStack.class, new ItemStackDeserializer()).create();
 
 	public static class ItemStackSerializer implements JsonSerializer<ItemStack> {
 		@Override
 		public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context) {
+			removePetInfo(src);
 			NBTTagCompound tag = src.serializeNBT();
 			return nbtToJson(tag);
 		}
@@ -94,7 +97,7 @@ public class StorageManager {
 
 	private static final Pattern JSON_FIX_REGEX = Pattern.compile("\"([^,:]+)\":");
 
-	public static class ItemStackDeserilizer implements JsonDeserializer<ItemStack> {
+	public static class ItemStackDeserializer implements JsonDeserializer<ItemStack> {
 		@Override
 		public ItemStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
@@ -132,6 +135,12 @@ public class StorageManager {
 
 	private static JsonObject nbtToJson(NBTTagCompound NBTTagCompound) {
 		return (JsonObject) loadJson(NBTTagCompound);
+	}
+
+	private static ItemStack removePetInfo(ItemStack src) {
+		if (!src.getTagCompound().hasKey("ExtraAttributes") || !src.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("petInfo")) return src;
+		src.getTagCompound().getCompoundTag("ExtraAttributes").removeTag("petInfo");
+		return src;
 	}
 
 	private static JsonElement loadJson(NBTBase tag) {
