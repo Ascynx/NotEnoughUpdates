@@ -61,6 +61,7 @@ import net.minecraft.network.play.server.S2DPacketOpenWindow;
 import net.minecraft.network.play.server.S2EPacketCloseWindow;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.network.play.server.S30PacketWindowItems;
+import org.lwjgl.Sys;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -74,6 +75,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,7 +91,7 @@ public class StorageManager {
 	public static class ItemStackSerializer implements JsonSerializer<ItemStack> {
 		@Override
 		public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context) {
-			removePetInfo(src);
+			fixPetInfo(src);
 			NBTTagCompound tag = src.serializeNBT();
 			return nbtToJson(tag);
 		}
@@ -137,10 +139,61 @@ public class StorageManager {
 		return (JsonObject) loadJson(NBTTagCompound);
 	}
 
-	private static ItemStack removePetInfo(ItemStack src) {
-		if (!src.getTagCompound().hasKey("ExtraAttributes") || !src.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("petInfo")) return src;
+	private static class PetInfo {
+		String type;
+		Boolean active;
+		Double exp;
+		String tier;
+		Boolean hideInfo;
+		Integer candyUsed;
+		String uuid;
+		Boolean hideRightClick;
+		String heldItem;
+		String skin;
+
+		private <T> void appendIfNotNull(StringBuilder builder, String key, T value) {
+			if (value != null) {
+				if (builder.indexOf("{") != builder.length()-1) {
+					builder.append(",");
+				}
+				builder.append(key).append(":");
+				if (value instanceof String) {
+					builder.append("\"").append(value).append("\"");
+				} else {
+					builder.append(value);
+				}
+			}
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder object = new StringBuilder();
+			object.append("{");
+			appendIfNotNull(object, "type", type);
+			appendIfNotNull(object, "active", active);
+			appendIfNotNull(object, "exp", exp);
+			appendIfNotNull(object, "tier", tier);
+			appendIfNotNull(object, "hideInfo", hideInfo);
+			appendIfNotNull(object, "candyUsed", candyUsed);
+			appendIfNotNull(object, "uuid", uuid);
+			appendIfNotNull(object, "hideRightClick", hideRightClick);
+			appendIfNotNull(object, "heldItem", heldItem);
+			appendIfNotNull(object, "skin", skin);
+			object.append("}");
+			return object.toString();
+		}
+	}
+
+	private static void fixPetInfo(ItemStack src) {
+		if (!src.getTagCompound().hasKey("ExtraAttributes") || !src.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("petInfo")) return;
+		PetInfo oldPetInfo = GSON.fromJson(src.getTagCompound().getCompoundTag("ExtraAttributes").getString("petInfo"), PetInfo.class);
 		src.getTagCompound().getCompoundTag("ExtraAttributes").removeTag("petInfo");
-		return src;
+		try {
+			src.getTagCompound().getCompoundTag("ExtraAttributes").setTag(
+				"petInfo",
+				JsonToNBT.getTagFromJson(oldPetInfo.toString())
+			);
+		} catch (NBTException | NullPointerException ignored) {}
 	}
 
 	private static JsonElement loadJson(NBTBase tag) {
