@@ -2938,4 +2938,91 @@ public class NEUOverlay extends Gui {
 	public float getInfoPaneOffsetFactor() {
 		return infoPaneOffsetFactor.getValue() * getWidthMult();
 	}
+
+	public void renderPreviewArmorHud() {
+		if (!NotEnoughUpdates.INSTANCE.config.customArmour.enableArmourHud) return;
+
+		Utils.resetGuiScale();
+		Utils.pushGuiScale(NotEnoughUpdates.INSTANCE.config.itemlist.paneGuiScale);
+
+		int width = Utils.peekGuiScale().getScaledWidth();
+		int height = Utils.peekGuiScale().getScaledHeight();
+
+
+		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 0) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY);
+		}
+		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 1) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_GREY);
+		}
+		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 2) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_DARK);
+		}
+		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 3) {
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 3 &&
+				NotEnoughUpdates.INSTANCE.config.petOverlay.petInvDisplay && petSlot != null) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_TRANSPARENT_PET);
+			} else {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_TRANSPARENT);
+			}
+		}
+		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 4) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_FSR);
+		}
+
+		GlStateManager.color(1, 1, 1, 1);
+		GL11.glTranslatef(0, 0, 401);
+		float yNumber = (float) (height - 167) / 2f;
+		Utils.drawTexturedRect((float) ((width - 224.1) / 2f), yNumber, 31, 86, GL11.GL_NEAREST);
+		GlStateManager.bindTexture(0);
+	}
+
+	public void renderPreviewPetInvHud() {
+		if (!NotEnoughUpdates.INSTANCE.config.petOverlay.petInvDisplay) return;
+
+		Utils.resetGuiScale();
+		Utils.pushGuiScale(NotEnoughUpdates.INSTANCE.config.itemlist.paneGuiScale);
+
+		int width = Utils.peekGuiScale().getScaledWidth();
+		int height = Utils.peekGuiScale().getScaledHeight();
+		if (!NotEnoughUpdates.INSTANCE.config.customArmour.enableArmourHud) {
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 0) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 1) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_GREY);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 2) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_DARK);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 3) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_TRANSPARENT);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 4) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_FSR);
+			}
+		} else {
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 0) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 1) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_GREY);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 2) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_DARK);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 3) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_TRANSPARENT);
+			}
+			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 4) {
+				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_FSR);
+			}
+		}
+
+		GlStateManager.color(1, 1, 1, 1);
+		GL11.glTranslatef(0, 0, 401);
+		float yNumber = (float) (height - 23) / 2f;
+		Utils.drawTexturedRect((float) ((width - 224.1) / 2f), yNumber, 31, 32, GL11.GL_NEAREST);
+		GlStateManager.bindTexture(0);
+	}
 }
