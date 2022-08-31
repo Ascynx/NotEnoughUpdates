@@ -2939,6 +2939,38 @@ public class NEUOverlay extends Gui {
 		return infoPaneOffsetFactor.getValue() * getWidthMult();
 	}
 
+	public ResourceLocation getCustomEquipmentTexture(boolean isPetRendering) {
+		switch (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle) {
+			case 0:
+				return ARMOR_DISPLAY;
+			case 1:
+				return ARMOR_DISPLAY_GREY;
+			case 2:
+				return ARMOR_DISPLAY_DARK;
+			case 3:
+				return isPetRendering ? ARMOR_DISPLAY_TRANSPARENT_PET : ARMOR_DISPLAY_TRANSPARENT;
+			case 4:
+				return ARMOR_DISPLAY_FSR;
+		}
+		return null;
+	}
+
+	public ResourceLocation getCustomPetTexture(boolean isArmorRendering) {
+		switch (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle) {
+			case 0:
+				return isArmorRendering ? PET_ARMOR_DISPLAY : PET_DISPLAY;
+			case 1:
+				return isArmorRendering ? PET_ARMOR_DISPLAY_GREY : PET_DISPLAY_GREY;
+			case 2:
+				return isArmorRendering ? PET_ARMOR_DISPLAY_DARK : PET_DISPLAY_DARK;
+			case 3:
+				return isArmorRendering ? PET_ARMOR_DISPLAY_TRANSPARENT : PET_DISPLAY_TRANSPARENT;
+			case 4:
+				return isArmorRendering ? PET_ARMOR_DISPLAY_FSR : PET_DISPLAY_FSR;
+		}
+		return null;
+	}
+
 	public void renderPreviewArmorHud() {
 		if (!NotEnoughUpdates.INSTANCE.config.customArmour.enableArmourHud) return;
 
@@ -2948,27 +2980,7 @@ public class NEUOverlay extends Gui {
 		int width = Utils.peekGuiScale().getScaledWidth();
 		int height = Utils.peekGuiScale().getScaledHeight();
 
-
-		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 0) {
-			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY);
-		}
-		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 1) {
-			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_GREY);
-		}
-		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 2) {
-			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_DARK);
-		}
-		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 3) {
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 3 &&
-				NotEnoughUpdates.INSTANCE.config.petOverlay.petInvDisplay && petSlot != null) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_TRANSPARENT_PET);
-			} else {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_TRANSPARENT);
-			}
-		}
-		if (NotEnoughUpdates.INSTANCE.config.customArmour.colourStyle == 4) {
-			Minecraft.getMinecraft().getTextureManager().bindTexture(ARMOR_DISPLAY_FSR);
-		}
+		Minecraft.getMinecraft().getTextureManager().bindTexture(getCustomEquipmentTexture(NotEnoughUpdates.INSTANCE.config.petOverlay.petInvDisplay && petSlot != null));
 
 		GlStateManager.color(1, 1, 1, 1);
 		GL11.glTranslatef(0, 0, 401);
@@ -2985,39 +2997,8 @@ public class NEUOverlay extends Gui {
 
 		int width = Utils.peekGuiScale().getScaledWidth();
 		int height = Utils.peekGuiScale().getScaledHeight();
-		if (!NotEnoughUpdates.INSTANCE.config.customArmour.enableArmourHud) {
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 0) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 1) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_GREY);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 2) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_DARK);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 3) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_TRANSPARENT);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 4) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_DISPLAY_FSR);
-			}
-		} else {
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 0) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 1) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_GREY);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 2) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_DARK);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 3) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_TRANSPARENT);
-			}
-			if (NotEnoughUpdates.INSTANCE.config.petOverlay.colourStyle == 4) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(PET_ARMOR_DISPLAY_FSR);
-			}
-		}
+
+		Minecraft.getMinecraft().getTextureManager().bindTexture(getCustomPetTexture(NotEnoughUpdates.INSTANCE.config.customArmour.enableArmourHud));
 
 		GlStateManager.color(1, 1, 1, 1);
 		GL11.glTranslatef(0, 0, 401);
